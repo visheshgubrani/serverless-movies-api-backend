@@ -7,8 +7,6 @@ const doClient = DynamoDBDocumentClient.from(client)
 const genAI = new GoogleGenerativeAI(process.env.API_KEY)
 
 export const handler = async (event) => {
-  console.log('Event: ', JSON.stringify(event))
-
   if (!event.pathParameters || !event.pathParameters.movieName) {
     console.log('Missing movie name parameter')
     return {

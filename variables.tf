@@ -8,3 +8,5 @@ variable "s3_bucket_name" {}
 variable "lambda_basic_policy" {}
 variable "lambda_dynamodb_read_policy" {}
 variable "API_KEY" {}
+variable "lambda_runtime" {}
+variable "lambda_timeout" {}

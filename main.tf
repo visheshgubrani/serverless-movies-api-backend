@@ -28,7 +28,7 @@ resource "aws_dynamodb_table" "movies-table" {
     read_capacity   = 5
     write_capacity  = 5
   }
-  
+
   global_secondary_index {
     name            = "title-index"
     hash_key        = "title"
@@ -42,6 +42,7 @@ resource "aws_dynamodb_table" "movies-table" {
     Environment = "dev"
   }
 }
+
 # S3 Bucket
 resource "aws_s3_bucket" "s3_bucket" {
   bucket = var.s3_bucket_name
@@ -83,6 +84,8 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamo_db" {
   policy_arn = var.lambda_dynamodb_read_policy
 }
 
+# Lambda Function for getMovies
+
 data "archive_file" "get_movies_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/getMovies"
@@ -97,8 +100,10 @@ resource "aws_lambda_function" "get_movies" {
 
   source_code_hash = data.archive_file.get_movies_lambda.output_base64sha256
 
-  runtime = "nodejs20.x"
+  runtime = var.lambda_runtime
 }
+
+# Lambda Function for getMoviesByYear
 
 data "archive_file" "get_movies_by_year_lambda" {
   type        = "zip"
@@ -114,8 +119,10 @@ resource "aws_lambda_function" "get_movies_by_year" {
 
   source_code_hash = data.archive_file.get_movies_by_year_lambda.output_base64sha256
 
-  runtime = "nodejs20.x"
+  runtime = var.lambda_runtime
 }
+
+# Lambda Function for generateMovieSummary
 
 data "archive_file" "generate_movie_summary_lambda" {
   type        = "zip"
@@ -128,11 +135,11 @@ resource "aws_lambda_function" "generate_movie_summary" {
   function_name = "genMovieSummary"
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "index.handler"
-  timeout = 15
+  timeout       = var.lambda_timeout
 
   source_code_hash = data.archive_file.generate_movie_summary_lambda.output_base64sha256
 
-  runtime = "nodejs20.x"
+  runtime = var.lambda_runtime
 
   environment {
     variables = {
